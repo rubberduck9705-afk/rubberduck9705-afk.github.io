@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTB WriteUps | RubberDuck9705</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-green: #00cc33;
+            --bg-dark: #0a0e1a;
+            --bg-darker: #050810;
+            --text-primary: #e0e0e0;
+            --text-muted: #8892b0;
+            --easy: #00ff41;
+            --medium: #ffc107;
+            --hard: #ff5722;
+            --insane: #e91e63;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #0d1929 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        nav {
+            position: relative;
+            z-index: 100;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a.active,
+        .nav-links a:hover {
+            color: var(--neon-green);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-green);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .nav-links a.active::after,
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .header {
+            position: relative;
+            z-index: 10;
+            padding: 4rem 5% 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .stats-bar {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            padding: 2rem 5%;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .machines-grid {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 2rem 5%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .machine-card {
+            background: rgba(10, 14, 26, 0.8);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .machine-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(0, 255, 65, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .machine-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-green);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .machine-card:hover::before {
+            opacity: 1;
+        }
+
+        .machine-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #0a0e1a, #1a2332);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+        }
+
+        .machine-content {
+            padding: 1.5rem;
+        }
+
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .machine-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .machine-os {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .difficulty-badge {
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid;
+            text-align: center;
+        }
+
+        .difficulty-easy {
+            color: var(--easy);
+            border-color: var(--easy);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .difficulty-medium {
+            color: var(--medium);
+            border-color: var(--medium);
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .machine-description {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .machine-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            color: var(--neon-green);
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .read-writeup-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            text-decoration: none;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .read-writeup-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-green);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .read-writeup-btn:hover {
+            color: var(--bg-dark);
+        }
+
+        .read-writeup-btn:hover::before {
+            left: 0;
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 5%;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .machines-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="../index.html" class="logo">RUBBERDUCK9705</a>
+        <ul class="nav-links">
+            <li><a href="../index.html#blog">BLOG</a></li>
+            <li><a href="../index.html#labs">LABS</a></li>
+            <li><a href="index.html" class="active">HTB WRITEUPS</a></li>
+            <li><a href="../index.html#about">ABOUT</a></li>
+        </ul>
+    </nav>
+
+    <section class="header">
+        <h1>🎯 HACK THE BOX WRITEUPS</h1>
+        <p>Detailed walkthroughs of HTB machines from enumeration to root. Learn the methodologies, tools, and techniques used to pwn each box.</p>
+    </section>
+
+    <section class="stats-bar">
+        <div class="stat">
+            <span class="stat-number">1</span>
+            <span class="stat-label">Machines Pwned</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">1</span>
+            <span class="stat-label">Easy</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Medium</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Hard</span>
+        </div>
+    </section>
+
+    <section class="machines-grid">
+        <!-- GoodGames Machine -->
+        <article class="machine-card">
+            <div class="machine-thumbnail">🎮</div>
+            <div class="machine-content">
+                <div class="machine-header">
+                    <div>
+                        <h2 class="machine-title">GoodGames</h2>
+                        <p class="machine-os">🐧 Linux</p>
+                    </div>
+                    <span class="difficulty-badge difficulty-easy">EASY</span>
+                </div>
+                <p class="machine-description">
+                    A vulnerable gaming platform with SQL injection vulnerabilities leading to database compromise and eventual container escape.
+                </p>
+                <div class="machine-tags">
+                    <span class="tag">SQL INJECTION</span>
+                    <span class="tag">SQLMAP</span>
+                    <span class="tag">DOCKER</span>
+                    <span class="tag">CONTAINER ESCAPE</span>
+                </div>
+                <a href="goodgames/goodgames.html" class="read-writeup-btn">READ WRITEUP →</a>
+            </div>
+        </article>
+
+        <!-- Template for future machines - just copy and modify -->
+        <!--
+        <article class="machine-card">
+            <div class="machine-thumbnail">💀</div>
+            <div class="machine-content">
+                <div class="machine-header">
+                    <div>
+                        <h2 class="machine-title">Machine Name</h2>
+                        <p class="machine-os">🐧 Linux / 🪟 Windows</p>
+                    </div>
+                    <span class="difficulty-badge difficulty-medium">MEDIUM</span>
+                </div>
+                <p class="machine-description">
+                    Brief description of the machine and attack vectors.
+                </p>
+                <div class="machine-tags">
+                    <span class="tag">WEB</span>
+                    <span class="tag">PRIVILEGE ESCALATION</span>
+                </div>
+                <a href="machinename/machinename.html" class="read-writeup-btn">READ WRITEUP →</a>
+            </div>
+        </article>
+        -->
+    </section>
+
+    <footer>
+        <p>© 2025 RubberDuck9705 | All HTB writeups are for educational purposes only.</p>
+    </footer>
+</body>
+</html>
