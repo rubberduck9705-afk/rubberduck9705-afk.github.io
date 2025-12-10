@@ -30,6 +30,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            scroll-behavior: smooth;
         }
 
         /* Animated grid background */
@@ -326,6 +327,30 @@
             line-height: 1.6;
         }
 
+        /* Coming Soon Sections */
+        .coming-soon-section {
+            position: relative;
+            z-index: 10;
+            padding: 6rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        .coming-soon-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .coming-soon-section p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             h1 {
@@ -388,6 +413,21 @@
             <h3>HTB WriteUps</h3>
             <p>Detailed write-ups of Hack The Box machines, challenges, and methodologies from enumeration to root.</p>
         </div>
+    </section>
+
+    <section id="blog" class="coming-soon-section">
+        <h2>📝 Blog</h2>
+        <p>Security research articles and technical deep-dives coming soon...</p>
+    </section>
+
+    <section id="labs" class="coming-soon-section">
+        <h2>🧪 Pentesting Labs</h2>
+        <p>Custom vulnerable environments and lab walkthroughs coming soon...</p>
+    </section>
+
+    <section id="about" class="coming-soon-section">
+        <h2>👤 About Me</h2>
+        <p>Information about my cybersecurity journey and experience coming soon...</p>
     </section>
 </body>
 </html>
