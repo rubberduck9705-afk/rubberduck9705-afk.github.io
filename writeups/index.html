@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTB WriteUps | RubberDuck9705</title>
+    <title>RubberDuck9705 | Security Research & HTB WriteUps</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -15,10 +15,6 @@
             --bg-darker: #050810;
             --text-primary: #e0e0e0;
             --text-muted: #8892b0;
-            --easy: #00ff41;
-            --medium: #ffc107;
-            --hard: #ff5722;
-            --insane: #e91e63;
         }
 
         * {
@@ -32,9 +28,11 @@
             background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #0d1929 100%);
             color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
             position: relative;
         }
 
+        /* Animated grid background */
         body::before {
             content: '';
             position: fixed;
@@ -56,6 +54,14 @@
             100% { transform: translate(50px, 50px); }
         }
 
+        /* Glow effect */
+        .glow {
+            text-shadow: 0 0 10px var(--neon-green),
+                         0 0 20px var(--neon-green),
+                         0 0 30px var(--neon-green);
+        }
+
+        /* Navigation */
         nav {
             position: relative;
             z-index: 100;
@@ -74,6 +80,12 @@
             color: var(--neon-green);
             text-decoration: none;
             letter-spacing: 2px;
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
         }
 
         .nav-links {
@@ -91,11 +103,6 @@
             position: relative;
         }
 
-        .nav-links a.active,
-        .nav-links a:hover {
-            color: var(--neon-green);
-        }
-
         .nav-links a::after {
             content: '';
             position: absolute;
@@ -108,200 +115,95 @@
             box-shadow: 0 0 8px var(--neon-green);
         }
 
-        .nav-links a.active::after,
+        .nav-links a:hover {
+            color: var(--neon-green);
+        }
+
         .nav-links a:hover::after {
             width: 100%;
         }
 
-        .header {
+        /* Hero Section */
+        .hero {
             position: relative;
             z-index: 10;
-            padding: 4rem 5% 2rem;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            color: var(--neon-green);
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px var(--neon-green);
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .stats-bar {
-            position: relative;
-            z-index: 10;
+            min-height: 80vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
-            gap: 3rem;
-            padding: 2rem 5%;
-            margin-bottom: 2rem;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--neon-green);
-            display: block;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .machines-grid {
-            position: relative;
-            z-index: 10;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-            padding: 2rem 5%;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        .machine-card {
-            background: rgba(10, 14, 26, 0.8);
-            border: 1px solid rgba(0, 255, 65, 0.2);
-            overflow: hidden;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .machine-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(0, 255, 65, 0.05));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .machine-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-green);
-            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
-        }
-
-        .machine-card:hover::before {
-            opacity: 1;
-        }
-
-        .machine-thumbnail {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #0a0e1a, #1a2332);
-            display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            text-align: center;
+            padding: 2rem 5%;
         }
 
-        .machine-content {
-            padding: 1.5rem;
-        }
-
-        .machine-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+        .terminal-prompt {
+            color: var(--neon-green);
+            font-size: 1.2rem;
             margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
-        .machine-title {
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+        }
+
+        h1 .highlight {
             color: var(--neon-green);
-            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px var(--neon-green),
+                         0 0 40px var(--neon-green);
         }
 
-        .machine-os {
-            font-size: 0.9rem;
+        .subtitle {
+            font-size: 1.3rem;
             color: var(--text-muted);
-        }
-
-        .difficulty-badge {
-            padding: 0.4rem 1rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 2px solid;
-            text-align: center;
-        }
-
-        .difficulty-easy {
-            color: var(--easy);
-            border-color: var(--easy);
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-        }
-
-        .difficulty-medium {
-            color: var(--medium);
-            border-color: var(--medium);
-            box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
-        }
-
-        .machine-description {
-            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 3rem;
             line-height: 1.6;
-            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.4s forwards;
         }
 
-        .machine-tags {
+        .cta-buttons {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            gap: 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;
         }
 
-        .tag {
-            padding: 0.3rem 0.8rem;
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            color: var(--neon-green);
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-
-        .read-writeup-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background: transparent;
-            border: 2px solid var(--neon-green);
-            color: var(--neon-green);
+        .btn {
+            padding: 1rem 2.5rem;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
+            font-size: 1rem;
             text-decoration: none;
-            text-align: center;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            border: 2px solid var(--neon-green);
+            background: transparent;
+            color: var(--neon-green);
+            cursor: pointer;
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
         }
 
-        .read-writeup-btn::before {
+        .btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -313,132 +215,179 @@
             z-index: -1;
         }
 
-        .read-writeup-btn:hover {
+        .btn:hover {
             color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--neon-green);
         }
 
-        .read-writeup-btn:hover::before {
+        .btn:hover::before {
             left: 0;
         }
 
-        footer {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 3rem 5%;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(0, 255, 65, 0.1);
+        .btn-secondary {
+            border-color: var(--text-muted);
             color: var(--text-muted);
         }
 
+        .btn-secondary::before {
+            background: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--text-primary);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.8s forwards, bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        .scroll-indicator::after {
+            content: '↓';
+            font-size: 1.5rem;
+            color: var(--neon-green);
+        }
+
+        /* Featured sections preview */
+        .featured-grid {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(10, 14, 26, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(0, 255, 65, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--neon-green);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .machines-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-bar {
-                flex-direction: column;
-                gap: 1.5rem;
+            h1 {
+                font-size: 2.5rem;
             }
 
             .nav-links {
                 gap: 1.5rem;
-                font-size: 0.85rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <nav>
-        <a href="../index.html" class="logo">RUBBERDUCK9705</a>
+        <a href="#" class="logo">RUBBERDUCK9705</a>
         <ul class="nav-links">
-            <li><a href="../index.html#blog">BLOG</a></li>
-            <li><a href="../index.html#labs">LABS</a></li>
-            <li><a href="index.html" class="active">HTB WRITEUPS</a></li>
-            <li><a href="../index.html#about">ABOUT</a></li>
+            <li><a href="#blog">BLOG</a></li>
+            <li><a href="#labs">LABS</a></li>
+            <li><a href="writeups/index.html">HTB WRITEUPS</a></li>
+            <li><a href="#about">ABOUT</a></li>
         </ul>
     </nav>
 
-    <section class="header">
-        <h1>🎯 HACK THE BOX WRITEUPS</h1>
-        <p>Detailed walkthroughs of HTB machines from enumeration to root. Learn the methodologies, tools, and techniques used to pwn each box.</p>
+    <section class="hero">
+        <div class="terminal-prompt">root@security:~$</div>
+        <h1>Security Research<br><span class="highlight">& Penetration Testing</span></h1>
+        <p class="subtitle">
+            Documenting my journey through cybersecurity challenges, vulnerability research, 
+            and Hack The Box conquests. One exploit at a time.
+        </p>
+        <div class="cta-buttons">
+            <a href="#blog" class="btn">READ LATEST POSTS</a>
+            <a href="writeups/index.html" class="btn btn-secondary">HTB WRITEUPS</a>
+        </div>
+        <div class="scroll-indicator">SCROLL</div>
     </section>
 
-    <section class="stats-bar">
-        <div class="stat">
-            <span class="stat-number">1</span>
-            <span class="stat-label">Machines Pwned</span>
+    <section class="featured-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>Blog Posts</h3>
+            <p>In-depth articles on security research, exploitation techniques, and lessons learned from real-world scenarios.</p>
         </div>
-        <div class="stat">
-            <span class="stat-number">1</span>
-            <span class="stat-label">Easy</span>
+        <div class="feature-card">
+            <div class="feature-icon">🧪</div>
+            <h3>Pentesting Labs</h3>
+            <p>Custom vulnerable environments and walkthroughs for hands-on learning and practice.</p>
         </div>
-        <div class="stat">
-            <span class="stat-number">0</span>
-            <span class="stat-label">Medium</span>
-        </div>
-        <div class="stat">
-            <span class="stat-number">0</span>
-            <span class="stat-label">Hard</span>
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>HTB WriteUps</h3>
+            <p>Detailed write-ups of Hack The Box machines, challenges, and methodologies from enumeration to root.</p>
         </div>
     </section>
-
-    <section class="machines-grid">
-        <!-- GoodGames Machine -->
-        <article class="machine-card">
-            <div class="machine-thumbnail">🎮</div>
-            <div class="machine-content">
-                <div class="machine-header">
-                    <div>
-                        <h2 class="machine-title">GoodGames</h2>
-                        <p class="machine-os">🐧 Linux</p>
-                    </div>
-                    <span class="difficulty-badge difficulty-easy">EASY</span>
-                </div>
-                <p class="machine-description">
-                    A vulnerable gaming platform with SQL injection vulnerabilities leading to database compromise and eventual container escape.
-                </p>
-                <div class="machine-tags">
-                    <span class="tag">SQL INJECTION</span>
-                    <span class="tag">SQLMAP</span>
-                    <span class="tag">DOCKER</span>
-                    <span class="tag">CONTAINER ESCAPE</span>
-                </div>
-                <a href="goodgames/goodgames.html" class="read-writeup-btn">READ WRITEUP →</a>
-            </div>
-        </article>
-
-        <!-- Template for future machines - just copy and modify -->
-        <!--
-        <article class="machine-card">
-            <div class="machine-thumbnail">💀</div>
-            <div class="machine-content">
-                <div class="machine-header">
-                    <div>
-                        <h2 class="machine-title">Machine Name</h2>
-                        <p class="machine-os">🐧 Linux / 🪟 Windows</p>
-                    </div>
-                    <span class="difficulty-badge difficulty-medium">MEDIUM</span>
-                </div>
-                <p class="machine-description">
-                    Brief description of the machine and attack vectors.
-                </p>
-                <div class="machine-tags">
-                    <span class="tag">WEB</span>
-                    <span class="tag">PRIVILEGE ESCALATION</span>
-                </div>
-                <a href="machinename/machinename.html" class="read-writeup-btn">READ WRITEUP →</a>
-            </div>
-        </article>
-        -->
-    </section>
-
-    <footer>
-        <p>© 2025 RubberDuck9705 | All HTB writeups are for educational purposes only.</p>
-    </footer>
 </body>
 </html>
